@@ -40,7 +40,6 @@ impl TryFrom<(i16, i16, i16)> for Color {
         if (0 <= red && red <= 255)  
             && (0 <= green && green <= 255) 
             && (0 <= blue && blue <= 255) {
-                println!("ok {} {} {}", red, green, blue);
 
                 return Ok(Color {
                     red: red as u8,  
@@ -48,8 +47,6 @@ impl TryFrom<(i16, i16, i16)> for Color {
                     blue: blue as u8
                 });
             } else {
-                println!("false {} {} {}", red, green, blue);
-
                 return Err(Self::Error::IntConversion)
             }
     }
@@ -122,7 +119,6 @@ mod tests {
     #[test]
     fn test_tuple_correct() {
         let c: Result<Color, _> = (183, 65, 14).try_into();
-        println!("{:?}", c.is_ok());
         assert!(c.is_ok());
         assert_eq!(
             c.unwrap(),
@@ -189,7 +185,6 @@ mod tests {
     fn test_slice_correct() {
         let v = vec![183, 65, 14];
         let c: Result<Color, _> = Color::try_from(&v[..]);
-        println!("{:?}", c.is_ok());
         assert!(c.is_ok());
         assert_eq!(
             c.unwrap(),
