@@ -37,16 +37,19 @@ impl TryFrom<(i16, i16, i16)> for Color {
     type Error = IntoColorError;
     fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
         let (red, green, blue) = tuple;
-        
-        if 0 >= red && red <= 255  
-            && 0 >= green && green >= 255 
-            && 0 >= blue && blue <= 255 {
+        if (0 <= red && red <= 255)  
+            && (0 <= green && green <= 255) 
+            && (0 <= blue && blue <= 255) {
+                println!("ok {} {} {}", red, green, blue);
+
                 return Ok(Color {
                     red: red as u8,  
                     green: green as u8,
                     blue: blue as u8
                 });
             } else {
+                println!("false {} {} {}", red, green, blue);
+
                 return Err(Self::Error::IntConversion)
             }
     }
@@ -56,12 +59,7 @@ impl TryFrom<(i16, i16, i16)> for Color {
 impl TryFrom<[i16; 3]> for Color {
     type Error = IntoColorError;
     fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
-        let a: Vec<u8> = arr
-            .into_iter()
-            .map(|x| *x as u8)
-            .collect();
-        Ok( Color {red: a[0], green: a[1], blue: a[2]})
-
+        arr[..].try_into()
     }
 }
 
@@ -69,7 +67,11 @@ impl TryFrom<[i16; 3]> for Color {
 impl TryFrom<&[i16]> for Color {
     type Error = IntoColorError;
     fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
-        Ok( Color {red: 1, green: 2, blue: 3})
+
+        if slice.len() != 3 {
+            return Err(Self::Error::BadLen);
+        }
+	    (slice[0], slice[1], slice[2]).try_into()
 
     }
 }
@@ -120,6 +122,7 @@ mod tests {
     #[test]
     fn test_tuple_correct() {
         let c: Result<Color, _> = (183, 65, 14).try_into();
+        println!("{:?}", c.is_ok());
         assert!(c.is_ok());
         assert_eq!(
             c.unwrap(),
@@ -186,6 +189,7 @@ mod tests {
     fn test_slice_correct() {
         let v = vec![183, 65, 14];
         let c: Result<Color, _> = Color::try_from(&v[..]);
+        println!("{:?}", c.is_ok());
         assert!(c.is_ok());
         assert_eq!(
             c.unwrap(),
